@@ -9,6 +9,42 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func BenchmarkNewDense(b *testing.B) {
+	table := []struct{
+		Name string
+		Engine Engine
+		Type Dtype
+	}{
+		{
+			"StdEng Float32",
+			StdEng{},
+			Float32,
+		},
+		{
+			"Float32Engine",
+			Float32Engine{},
+			Float32,
+		},
+		{
+			"StdEng Float64",
+			StdEng{},
+			Float64,
+		},
+		{
+			"Float64Engine",
+			Float64Engine{},
+			Float64,
+		},
+	}
+	for _, row := range table {
+		b.Run(row.Name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				NewDense(row.Type, Shape{2, 2, 2}, WithEngine(row.Engine))
+			}
+		})
+	}
+}
+
 func TestDense_ShallowClone(t *testing.T) {
 	T := New(Of(Float64), WithBacking([]float64{1, 2, 3, 4}))
 	T2 := T.ShallowClone()
